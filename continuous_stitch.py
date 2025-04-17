@@ -15,7 +15,7 @@ def run_superglue_on_all_pairs(start_idx, end_idx, input_dir, output_dir, temp_t
             f.write(f"{img1} {img2}\n")
 
     command = [
-        "python", "match_pairs.py",
+        sys.executable, "match_pairs.py",
         "--resize", "-1",
         "--superglue", "outdoor",
         "--max_keypoints", "2048",
