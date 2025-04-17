@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import subprocess
+import sys
 
 def run_superglue_on_all_pairs(start_idx, end_idx, input_dir, output_dir, temp_txt='temp_pairs.txt'):
     """
