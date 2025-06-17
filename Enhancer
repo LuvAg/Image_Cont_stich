@@ -1,0 +1,52 @@
+import numpy as np
+from PIL import Image
+import os
+import tensorflow as tf
+from huggingface_hub import from_pretrained_keras
+
+# Step 1: Load the pre-trained model
+model = from_pretrained_keras("keras-io/lowlight-enhance-mirnet")
+
+# Step 2: Load and preprocess the input image
+def load_and_preprocess_image(image_path):
+    # Load the image using PIL
+    img = Image.open(image_path).convert('RGB')
+    
+    # Resize the image if necessary (for example, resize to 256x256)
+    img = img.resize((256, 256))
+    
+    # Normalize the image to [0, 1] range
+    img_array = np.array(img) / 255.0
+    
+    # Add a batch dimension (model expects batch input)
+    img_array = np.expand_dims(img_array, axis=0)
+    
+    return img_array
+
+# Step 3: Enhance the image using the model
+def enhance_image(image_path):
+    # Preprocess the image
+    input_image = load_and_preprocess_image(image_path)
+    
+    # Run the model to enhance the image
+    enhanced_image = model.predict(input_image)
+    
+    # Post-process the enhanced image (convert it back to [0, 255] range)
+    enhanced_image = np.squeeze(enhanced_image) * 255.0
+    enhanced_image = np.clip(enhanced_image, 0, 255).astype(np.uint8)
+    
+    # Convert to PIL Image to display or save
+    enhanced_image_pil = Image.fromarray(enhanced_image)
+    return enhanced_image_pil
+output_dir = r'C:\Project Course\Under-Vehicle-image-Stitching-and-Prediction\InputImages_ref'
+# Step 4: Load, enhance, and save the result
+for i in range(1, 49):
+    input_image_path = rf'C:\Project Course\Under-Vehicle-image-Stitching-and-Prediction\Set-01\{i}.jpg'
+    output_image = enhance_image(input_image_path)
+    print()
+    # Save the enhanced image
+    output_image_path = os.path.join(output_dir, f'{i}.jpg')
+    output_image.save(output_image_path)
+
+    # Optionally, display the enhanced image (you can remove this if you don't need to display them all)
+    output_image.show()
